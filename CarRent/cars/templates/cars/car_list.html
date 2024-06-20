@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
+
+
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4CAF50;
+            padding: 10px 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #45a049;
+        }
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        .navbar .menu {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .menu a {
+            margin-left: 15px;
+        }
+        .authorized .add-btn, .authorized .notification-btn, .authorized .exit-btn, .authorized .filter-btn {
+            display: block;
+        }
+        .non-authorized .auth-btn {
+            display: block;
+        }
+        .authorized .auth-btn, .non-authorized .add-btn, .non-authorized .notification-btn, .non-authorized .exit-btn, .non-authorized .filter-btn {
+            display: none;
+        }
+        .content {
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+        .car-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .car-list .car-item {
+            background-color: white;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex: 1 1 calc(33.333% - 20px);
+            box-sizing: border-box;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .car-list .car-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .car-list .car-item img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+        .car-list .car-item h3 {
+            margin-top: 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .form-container input[type="text"],
+        .form-container input[type="tel"],
+        .form-container input[type="email"],
+        .form-container input[type="password"],
+        .form-container select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-container input[type="submit"],
+        .form-container .switch-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        .form-container input[type="submit"]:hover,
+        .form-container .switch-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Position the star icon in the top right corner */
+        .car-item {
+            position: relative;
+            border: 1px solid #ccc; /* Example border for demonstration */
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .star-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
+
+        .star-icon a {
+            font-size: 1.2rem;
+            color: #ffc107; /* Default star color */
+        }
+
+        .starred a.fas {
+            color: #ffc107; /* Filled star color */
+        }
+
+        .star-icon:hover a.far {
+            color: #ffc107; /* Outline star color on hover */
+        }
+
+        .car-list img{
+            width: 250px;
+            height: 180px;
+        }
+
+
+    </style>
+
+    <!-- {% extends 'cars/base.html' %}
+
+    {% block title %}Car List{% endblock %} -->
+</head>
+<body>
+    
+    <!-- {% block content %} -->
+    
+
+    <!-- Navigation Menu -->
+    <nav class="navbar" id="navbar">
+        <div class="logo" onclick="showPage('home')">
+            <a href="{% url 'car_list' %}">CarRent</a>
+        </div>
+        <div class="menu">
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}">Profile</a>
+                <a href="{% url 'add_car' %}" class="add-btn">Add Car</a>
+                <a href="{% url 'car_filter' %}" class="filter-btn">Filter</a>
+                <!-- <a href="#" class="notification-btn">Notifications</a> -->
+                <a href="{% url 'logout' %}" class="exit-btn">Log Out</a> 
+            {% else %}
+                <a href="{% url 'car_filter' %}" class="filter-btn">Filter</a>
+                <a href="{% url 'login' %}" class="auth-btn" onclick="showPage('authorization')">Login</a>
+                
+            {% endif %}
+        </div>
+    </nav>
+
+    <div id="home" class="content page">
+        <h1>Welcome to CarRent</h1>
+        <p>Your trusted car rental service.</p>
+
+        <!-- <ul>
+            {% for car in cars %}
+                <li>{{ car.make }} {{ car.model }} ({{ car.year }}) - ${{ car.price_per_day }} per day</li>
+            {% endfor %}
+        </ul> -->
+
+
+        <!-- List of Popular Cars -->
+        <div class="section">
+            <h2>Popular Cars</h2>
+            <div class="car-list">
+                {% for car in popular_cars %}
+                <div class="car-item">
+                    <a href="{% url 'car_detail' car.pk %}">
+                        <img src="{{ car.image1.url }}" alt="{{ car.brand }} {{ car.model }}" width="100">
+                    </a>
+                    
+                    <h3>{{ car.brand }} {{ car.model }}</h3>
+                    <p>Price: ${{ car.price }} per day </p>
+                    <p>Owner number: {{ car.ownerPhoneNumber }} </p>
+                    
+                    {% if user.is_authenticated %}
+                    <div class="action-buttons">
+                        
+
+                        <span class="star-icon {% if car in starred_cars %}starred{% endif %}" data-car-id="{{ car.id }}">
+                            {% if car in starred_cars %}
+                            <a href="{% url 'unstar_car' car.id % }" class="fas fa-star"></a> <!-- Filled star icon -->
+                            {% else %}
+                            <a href="{% url 'star_car' car.id %}" class="far fa-star"></a> <!-- Outline star icon -->
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p>No popular cars available.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- List of Available Cars -->
+        <div class="section">
+            <h2>Available Cars</h2>
+            <div class="car-list">
+                {% for car in cars %}
+                <div class="car-item">
+                    
+                    <a href="{% url 'car_detail' car.pk %}">
+                        <img src="{{ car.image1.url }}" alt="{{ car.brand }} {{ car.model }}" width="100">
+                    </a>
+                    
+                    <h3>{{ car.brand }} {{ car.model }}</h3>
+                    <p>Price: ${{ car.price }} per day </p>
+                    <p>Owner number: {{ car.ownerPhoneNumber }} </p>
+                    
+                    {% if user.is_authenticated %}
+                    <div class="action-buttons">
+                        
+                        <span class="star-icon {% if car in starred_cars %}starred{% endif %}" data-car-id="{{ car.id }}">
+                            {% if car in starred_cars %}
+                            <a href="{% url 'unstar_car' car.id %}"><i class="fas fa-star"></i></a> 
+                            {% else %}
+                            <a href="{% url 'star_car' car.id %}"><i class="far fa-star"></i></a> 
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+            </div>
+        </div>
+        
+        
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            var pages = document.querySelectorAll('.page');
+            pages.forEach(function(page) {
+                page.style.display = 'none';
+            });
+            document.getElementById(pageId).style.display = 'block';
+        }
+
+        function authorize(event) {
+            event.preventDefault();
+            // Perform authorization logic here
+
+            // On successful authorization
+            document.getElementById('navbar').classList.remove('non-authorized');
+            document.getElementById('navbar').classList.add('authorized');
+            showPage('home');
+        }
+
+        function register(event) {
+            event.preventDefault();
+            // Perform registration logic here
+
+            // On successful registration
+            showPage('authorization');
+        }
+
+        function logout() {
+            document.getElementById('navbar').classList.remove('authorized');
+            document.getElementById('navbar').classList.add('non-authorized');
+            showPage('authorization');
+        }
+
+        function filterCars(event) {
+            event.preventDefault();
+            var city = document.getElementById('city').value.toLowerCase();
+            var year = document.getElementById('year').value;
+            var capacity = document.getElementById('capacity').value;
+
+            var cars = [
+                { model: 'Car Model 1', city: 'batumi', year: '1998', capacity: '5', img: 'https://via.placeholder.com/300x200' },
+                { model: 'Car Model 2', city: 'tbilisi', year: '2005', capacity: '6', img: 'https://via.placeholder.com/300x200' },
+                { model: 'Car Model 3', city: 'kutaisi', year: '2001', capacity: '4', img: 'https://via.placeholder.com/300x200' },
+                // Add more car objects as needed
+            ];
+
+            var filteredCars = cars.filter(function(car) {
+                return (city === '' || car.city === city) &&
+                       (year === '' || (parseInt(car.year) >= parseInt(year.split('-')[0]) && parseInt(car.year) <= parseInt(year.split('-')[1]))) &&
+                       (capacity === '' || car.capacity === capacity);
+            });
+
+            var filteredCarsContainer = document.getElementById('filtered-cars');
+            filteredCarsContainer.innerHTML = '';
+
+            if (filteredCars.length > 0) {
+                filteredCars.forEach(function(car) {
+                    var carItem = document.createElement('div');
+                    carItem.className = 'car-item';
+                    carItem.innerHTML = `
+                        <img src="${car.img}" alt="${car.model}">
+                        <h3>${car.model}</h3>
+                        <p>City: ${car.city}</p>
+                        <p>Year: ${car.year}</p>
+                        <p>Capacity: ${car.capacity} people</p>
+                    `;
+                    filteredCarsContainer.appendChild(carItem);
+                });
+            } else {
+                filteredCarsContainer.innerHTML = '<p>No cars found matching the filter criteria.</p>';
+            }
+        }
+    </script>
+    <!-- {% endblock %} -->
+</body>
+</html>

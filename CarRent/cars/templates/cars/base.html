@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Car Rental{% endblock %}</title>
+</head>
+<body>
+    
+    <nav>
+        <ul>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'car_list' %}">Home</a></li>
+                <li><a href="{% url 'add_car' %}">Add Car</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>
